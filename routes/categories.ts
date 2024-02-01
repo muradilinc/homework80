@@ -42,12 +42,12 @@ categoriesRouter.get('/:id', async (req, res, next) => {
 
 categoriesRouter.delete('/:id', async (req, res, next) => {
   try {
-    await mysqlDb.getConnection().query(
+    const [results] = await mysqlDb.getConnection().query(
       'DELETE FROM categories WHERE id = ?',
       [req.params.id],
-    );
+    ) as ResultSetHeader[];
 
-    res.send('delete categories ' + req.params.id);
+    res.send('delete categories ' + results.insertId);
   } catch (error) {
     return next(error);
   }

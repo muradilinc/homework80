@@ -46,12 +46,12 @@ locationsRouter.get('/:id', async (req, res, next) => {
 
 locationsRouter.delete('/:id', async (req, res, next) => {
   try {
-    await mysqlDb.getConnection().query(
+    const [results] = await mysqlDb.getConnection().query(
       'DELETE FROM locations WHERE id = ?',
       [req.params.id],
-    );
+    ) as ResultSetHeader[];
 
-    res.send('delete location ' + req.params.id);
+    res.send('delete location ' + results.insertId);
   } catch (error) {
     return next(error);
   }

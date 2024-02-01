@@ -32,7 +32,7 @@ inventorsRouter.post('/', imagesUpload.single('image'), async (req, res, next) =
   }
 });
 
-inventorsRouter.get('/', async (req, res, next) => {
+inventorsRouter.get('/', async (_, res, next) => {
   try {
     const [results] = await mysqlDb.getConnection().query('SELECT * FROM items');
     res.send(results);
@@ -70,14 +70,30 @@ inventorsRouter.put('/:id', imagesUpload.single('image'), async (req, res, next)
       delivery: req.body.delivery,
       image: req.file ? req.file.filename : null,
     };
-    const fields: Item[] = [];
 
-    Object.entries(item).forEach(([key , value]) => {
-      console.log(typeof key);
-      if (value) {
-        fields.push(value);
-      }
-    });
+    const updateFields = Object.entries(item)
+      .filter(([key, value]) => value)
+      .map(([key, value]) => `${key === 'categoryId' ? 'category_id' : key && key === 'locationId' ? 'location_id': key} = ?`)
+      .join(', ');
+
+    if (updateFields) {
+      const query = `UPDATE items SET ${updateFields} WHERE id = ?`;
+      const values = Object.values(item).filter(value => value);
+      values.push(req.params.id);
+
+      const [results] = await mysqlDb.getConnection().query(query, values) as ResultSetHeader[];
+      res.send('ok');
+    }
+
+
+    // const fields: {[key: keyof Item]: string}[] = [];
+    //
+    // Object.entries(item).forEach(([key , value]) => {
+    //   if (value) {
+    //     const field = {[key]: value};
+    //     fields.push(field);
+    //   }
+    // });
 
     // const [results] = await mysqlDb.getConnection().query(
     //   'UPDATE item SET ? WHERE id = ?',
@@ -89,9 +105,7 @@ inventorsRouter.put('/:id', imagesUpload.single('image'), async (req, res, next)
     // if (!item) {
     //   return res.status(404).send({error: 'Not found !'});
     // }
-    console.log(fields);
-
-    res.send(fields);
+    // console.log(results);
   } catch (error) {
     return next(error);
   }
@@ -99,12 +113,12 @@ inventorsRouter.put('/:id', imagesUpload.single('image'), async (req, res, next)
 
 inventorsRouter.delete('/:id', async (req, res, next) => {
   try {
-    const results = await mysqlDb.getConnection().query(
+    const [results] = await mysqlDb.getConnection().query(
       'DELETE FROM items WHERE id = ?',
       [req.params.id],
     ) as ResultSetHeader[];
 
-    res.send('delete item ' + req.params.id);
+    res.send('delete item ' + results.insertId);
   } catch (error) {
     return next(error);
   }
