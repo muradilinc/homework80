@@ -1,7 +1,6 @@
 import express from 'express';
 import inventorsRouter from "./routes/inventors";
-import mysql from "mysql2/promise";
-import config from "./config";
+import mysqlDb from "./helpers/mysqlConnect";
 
 const app = express();
 const port = 8000;
@@ -11,7 +10,7 @@ app.use(express.json());
 app.use('/inventors', inventorsRouter);
 
 const run = async () => {
-  const connection = await mysql.createConnection(config.mysql);
+  await mysqlDb.init();
 
   app.listen(port, () => {
     console.log('we r online, port: ' + port);
