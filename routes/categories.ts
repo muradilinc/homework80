@@ -40,6 +40,31 @@ categoriesRouter.get('/:id', async (req, res, next) => {
   res.send(results);
 });
 
+categoriesRouter.put('/:id', async (req, res, next) => {
+  try {
+    const category: Category = {
+      title: req.body.title,
+      description: req.body.description,
+    };
+
+    const updateFields = Object.entries(category)
+      .filter(([key, value]) => value)
+      .map(([key, value]) => `${key} = ?`)
+      .join(', ');
+
+    if (updateFields) {
+      const query = `UPDATE categories SET ${updateFields} WHERE id = ?`;
+      const values = Object.values(category).filter(value => value);
+      values.push(req.params.id);
+
+      const [results] = await mysqlDb.getConnection().query(query, values) as ResultSetHeader[];
+      res.send(results.info);
+    }
+  } catch (error) {
+    return next(error);
+  }
+})
+
 categoriesRouter.delete('/:id', async (req, res, next) => {
   try {
     const [results] = await mysqlDb.getConnection().query(

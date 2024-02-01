@@ -44,6 +44,32 @@ locationsRouter.get('/:id', async (req, res, next) => {
   }
 });
 
+locationsRouter.put('/:id', async (req, res, next) => {
+  try {
+    const location: Location = {
+      name: req.body.name,
+      description: req.body.description,
+    };
+
+    const updateFields = Object.entries(location)
+      .filter(([key, value]) => value)
+      .map(([key, value]) => `${key} = ?`)
+      .join(', ');
+
+    if (updateFields) {
+      const query = `UPDATE locations SET ${updateFields} WHERE id = ?`;
+      const values = Object.values(location).filter(value => value);
+      values.push(req.params.id);
+
+      const [results] = await mysqlDb.getConnection().query(query, values) as ResultSetHeader[];
+      res.send(results.info);
+    }
+
+  } catch (error) {
+    return next(error);
+  }
+});
+
 locationsRouter.delete('/:id', async (req, res, next) => {
   try {
     const [results] = await mysqlDb.getConnection().query(

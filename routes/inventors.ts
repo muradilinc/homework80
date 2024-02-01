@@ -82,7 +82,7 @@ inventorsRouter.put('/:id', imagesUpload.single('image'), async (req, res, next)
       values.push(req.params.id);
 
       const [results] = await mysqlDb.getConnection().query(query, values) as ResultSetHeader[];
-      res.send('ok');
+      res.send(results.info);
     }
 
 
