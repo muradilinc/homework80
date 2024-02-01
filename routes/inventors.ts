@@ -18,7 +18,7 @@ inventorsRouter.post('/', imagesUpload.single('image'), async (req, res, next) =
     };
 
     const [result] = await mysqlDb.getConnection().query(
-      'INSERT INTO item (category_id, location_id, name, description, delivery, image)' +
+      'INSERT INTO items (category_id, location_id, name, description, delivery, image)' +
       'VALUES (?, ?, ?, ?, ?, ?)',
       [item.categoryId, item.locationId, item.name, item.description, item.delivery, item.image],
     ) as ResultSetHeader[];
@@ -34,7 +34,7 @@ inventorsRouter.post('/', imagesUpload.single('image'), async (req, res, next) =
 
 inventorsRouter.get('/', async (req, res, next) => {
   try {
-    const [results] = await mysqlDb.getConnection().query('SELECT * FROM item');
+    const [results] = await mysqlDb.getConnection().query('SELECT * FROM items');
     res.send(results);
   } catch (error) {
     return next(error);
@@ -44,7 +44,7 @@ inventorsRouter.get('/', async (req, res, next) => {
 inventorsRouter.get('/:id', async (req, res, next) => {
   try {
     const [results] = await mysqlDb.getConnection().query(
-      'SELECT item.name, item.description, delivery, image, c.title category_title, l.name location FROM item LEFT JOIN inventories.categories c on item.category_id = c.id LEFT JOIN inventories.location l on l.id = item.location_id WHERE item.id = ?',
+      'SELECT items.name, items.description, delivery, image, c.title category_title, l.name location FROM items LEFT JOIN inventories.categories c on items.category_id = c.id LEFT JOIN inventories.locations l on l.id = items.location_id WHERE items.id = ?',
       [req.params.id]
     ) as RowDataPacket[];
 
@@ -100,7 +100,7 @@ inventorsRouter.put('/:id', imagesUpload.single('image'), async (req, res, next)
 inventorsRouter.delete('/:id', async (req, res, next) => {
   try {
     const results = await mysqlDb.getConnection().query(
-      'DELETE FROM item WHERE id = ?',
+      'DELETE FROM items WHERE id = ?',
       [req.params.id],
     ) as ResultSetHeader[];
 

@@ -11,3 +11,7 @@ export interface Category {
   title: string;
   description: string;
 }
+export interface Location {
+  name: string;
+  description: string;
+}
