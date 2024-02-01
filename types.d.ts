@@ -6,3 +6,8 @@ export interface Item {
   description: string;
   image: string | null;
 }
+
+export interface Category {
+  title: string;
+  description: string;
+}
