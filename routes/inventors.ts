@@ -84,28 +84,6 @@ inventorsRouter.put('/:id', imagesUpload.single('image'), async (req, res, next)
       const [results] = await mysqlDb.getConnection().query(query, values) as ResultSetHeader[];
       res.send(results.info);
     }
-
-
-    // const fields: {[key: keyof Item]: string}[] = [];
-    //
-    // Object.entries(item).forEach(([key , value]) => {
-    //   if (value) {
-    //     const field = {[key]: value};
-    //     fields.push(field);
-    //   }
-    // });
-
-    // const [results] = await mysqlDb.getConnection().query(
-    //   'UPDATE item SET ? WHERE id = ?',
-    //   [fields, req.params.id],
-    // ) as RowDataPacket[];
-
-    // const item = results[0];
-    //
-    // if (!item) {
-    //   return res.status(404).send({error: 'Not found !'});
-    // }
-    // console.log(results);
   } catch (error) {
     return next(error);
   }
